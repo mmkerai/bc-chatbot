@@ -1,0 +1,19 @@
+{
+	"name": "template",
+	"version": "0.0.1",
+	"private": "true",
+	"engines": {
+		"node": "latest"
+	 },
+	"dependencies": { 
+		"body-parser": "latest",
+		"socket.io":"latest",
+		"express":"latest",
+		"dateformat":"latest",
+		"decode-html":"latest",
+		"request": "latest"
+	}
+
+}
+
+

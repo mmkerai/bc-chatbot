@@ -1,0 +1,1 @@
+# Boldchat test bot

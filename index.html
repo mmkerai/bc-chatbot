@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Chatbot Node.js test script</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
+	<script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="index.js"></script>
+</head>
+<body>
+<h2><center>Chatbot test script</center></h2>
+<p>&nbsp;</p>
+<div class="wrapper col-xs-12">
+	<div class="col-xs-2">
+		<div class='btn btn-primary' onClick='getDepartments()'>Get Departments</div>
+	</div>
+	<div class="col-xs-2">
+		<div class='btn btn-primary' onClick='getOperators()'>Get Operators</div>
+	</div>
+	<div class="col-xs-3">
+		<div class='btn btn-warning' onClick='startBot()'>Start bot</div>
+	</div>
+	<div class="col-xs-3">
+		<div class='btn btn-warning' onClick='stopBot()'>Stop bot</div>
+	</div>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+	<p class="text-center" id="error"></p>
+	<p class="text-center" id="message1"></p>
+	<p class="text-center" id="message2"></p>
+	<textarea id="dlog" cols="128" rows="20" class="col-xs-10 bg-info">Console:</textarea>
+</body>
+</html>
