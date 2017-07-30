@@ -5,15 +5,12 @@
 	"engines": {
 		"node": "latest"
 	 },
-	"dependencies": { 
+	"dependencies": {
 		"body-parser": "latest",
 		"socket.io":"latest",
 		"express":"latest",
-		"dateformat":"latest",
 		"decode-html":"latest",
 		"request": "latest"
 	}
 
 }
-
-

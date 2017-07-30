@@ -12,6 +12,7 @@ var app = require('express')();
 var fs = require('fs');
 var crypto = require('crypto');
 var bodyParser = require('body-parser');
+var decode = require('decode-html');
 
 app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
