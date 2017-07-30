@@ -450,6 +450,7 @@ function processChatMessage(cMsg) {
 	io.sockets.in(MESSAGEROOM).emit('chatMessage',cmobj);
 //	var csv = objectToCsv(cmobj);
 //	postToFile(csv);
+  }
 }
 
 function removeSocket(id, evname) {
