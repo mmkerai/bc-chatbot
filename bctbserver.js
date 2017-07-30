@@ -339,6 +339,7 @@ function operatorsCallback(dlist) {
     {
       mkOperatorID = dlist[i].LoginID;
       sendToLogs("Manji Operator ID: "+mkOperatorID);
+    }
 	}
 	sendToLogs("No of Operators: "+Object.keys(Operators).length);
 	OperatorsSetupComplete = true;
