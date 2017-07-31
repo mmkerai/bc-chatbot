@@ -457,11 +457,11 @@ function updateChatMsgTimer() {
 function sendBotMessage(cobj) {
   var botm;
 
-  if(cobj.text.indexOf("hello") !== -1 || obj.text.indexOf("hi") !== -1)
+  if(cobj.text.indexOf("hello") !== -1 || cobj.text.indexOf("hi") !== -1)
       botm = "Hi "+cobj.name+" how are you?";
-  else if(cobj.text.indexOf("help") !== -1 || obj.text.indexOf("please") !== -1)
+  else if(cobj.text.indexOf("help") !== -1 || cobj.text.indexOf("please") !== -1)
       botm = cobj.name+", how can I help you?";
-  else if(cobj.text.indexOf("bye") !== -1 || obj.text.indexOf("ciao") !== -1)
+  else if(cobj.text.indexOf("bye") !== -1 || cobj.text.indexOf("ciao") !== -1)
       botm = "Goodbye "+cobj.name+", talk to you soon";
   else
       botm = "Sorry "+cobj.name+", I dont understand, I am a bot";
