@@ -19,22 +19,6 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
 }));
 
-//****For Manji's local machine
-/*const options = {
-  pfx: fs.readFileSync('../sslcert/certificate.pfx'),
-  passphrase: 'mango'
-};
-/*
-//****for TechMBS
-const options = {
-  pfx: fs.readFileSync('boldchat_techmbs_in.pfx'),
-  passphrase: '1'
-}
-
-var PORT = Number(443);
-var server = https.createServer(options, app).listen(PORT);
-var	io = require('socket.io').listen(server);
-*/
 //********** Get port used by Heroku or use a default
 var PORT = Number(process.env.PORT || 7979);
 var server = http.createServer(app).listen(PORT);
@@ -42,31 +26,14 @@ var	io = require('socket.io').listen(server);
 
 //******* Get BoldChat API Credentials
 console.log("Reading API variables from config.json file...");
-const EndedReason = ["Unknown","Operator","Visitor","Disconnected"];
 var EnVars;
 var AID;
 var SETTINGSID;
 var KEY;
 
-try
-{
-	EnVars = JSON.parse(fs.readFileSync('config.json', 'utf8'));
-	AID = EnVars.AID || 0;
-	SETTINGSID = EnVars.APISETTINGSID || 0;
-	KEY = EnVars.APIKEY || 0;
-}
-catch(e)
-{
-	if(e.code === 'ENOENT')
-	{
-		console.log("Config file not found, Reading Heroku Environment Variables");
-		AID = process.env.AID || 0;
-		SETTINGSID = process.env.APISETTINGSID || 0;
-		KEY = process.env.APIKEY || 0;
-	}
-	else
-		console.log("Error code: "+e.code);
-}
+AID = process.env.AID || 0;
+SETTINGSID = process.env.APISETTINGSID || 0;
+KEY = process.env.APIKEY || 0;
 
 if(AID == 0 || SETTINGSID == 0 || KEY == 0)
 {
@@ -82,6 +49,14 @@ app.get('/', function(req, res){
 });
 app.get('/index.js', function(req, res){
 	res.sendFile(__dirname + '/index.js');
+});
+
+// Process incoming Boldchat triggered chat message
+app.get('/test', function(req, res){
+	res.send({ "result": "success" });
+	sendToLogs("New Chat Message, chat id: "+req.body.ChatID);
+	if(OperatorsSetupComplete)		//make sure all static data has been obtained first
+		processChatMessage(req.body);
 });
 
 // Process incoming Boldchat triggered chat message
@@ -455,7 +430,7 @@ function processChatMessage(cMsg) {
   }
 }
 
-function removeSocket(id, evname) {
+function removeSocket(id,evname) {
 	sendToLogs("Socket "+evname+" at "+ TimeNow);
 }
 
@@ -475,7 +450,7 @@ function updateChatMsgTimer() {
 
 function sendBotMessage(cobj) {
   var botm = "This is a message from a bot";
-  var str = "ChatID="+cobj.chatID+"&Type=0&Message="+botm+"&OperatorID="+mkOperatorID;
+  var str = "ChatID="+cobj.chatID+"&Type=0&Message="+encodeURIComponent(botm)+"&OperatorID="+mkOperatorID;
   getApiData("sendMessage",str,sendMessageCallback);
 
 }

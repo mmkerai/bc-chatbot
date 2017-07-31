@@ -1,4 +1,5 @@
 var socket = io.connect();
+const MONITORROOM = "monitor_room";		// socket room name for monitoring this service
 
 function getDepartments() {
 	socket.emit('departmentRequest',"");
@@ -9,11 +10,13 @@ function getOperators() {
 }
 
 function startBot() {
-	socket.emit('join room',"chat_message_room");
+	clearall();
+	$('#dlog').show();
+	socket.emit('join room',MONITORROOM);
 }
 
 function stopBot() {
-	socket.emit('leave room',"chat_message_room");
+	socket.emit('leave room',MONITORROOM);
 }
 
 $(document).ready(function() {
