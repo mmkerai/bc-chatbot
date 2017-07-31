@@ -311,7 +311,7 @@ function operatorsCallback(dlist) {
 	for(var i in dlist)
 	{
 		Operators[dlist[i].LoginID] = new OpMetrics(dlist[i].LoginID,dlist[i].Name);
-    if(dlist[i].Name.indexOf("Manji") !== -1)
+    if(dlist[i].Name.indexOf("Courtney") !== -1)
     {
       mkOperatorID = dlist[i].LoginID;
       sendToLogs("Manji Operator ID: "+mkOperatorID);
@@ -362,7 +362,7 @@ function getApiData(method,params,fcallback,cbparam) {
 			sendToLogs(emsg);
 			return;
 		}
-		var data = new Array();
+/*		var data = new Array();
 		data = jsonObj.Data;
 		if(data === 'undefined' || data == null)
 		{
@@ -370,8 +370,8 @@ function getApiData(method,params,fcallback,cbparam) {
 			emsg = TimeNow+ ":"+method+": No data: "+str;
 			sendToLogs(emsg);
 			return;
-		}
-		fcallback(data, cbparam);
+		}*/
+		fcallback(data,cbparam);
 
 		var next = jsonObj.Next;
 		if(typeof next !== 'undefined')
@@ -468,7 +468,6 @@ function sendBotMessage(cobj) {
 
   var str = "ChatID="+cobj.chatID+"&Type=operator&Message="+encodeURIComponent(botm)+"&OperatorID="+mkOperatorID;
   getApiData("addChatMessage",str,sendMessageCallback);
-
 }
 
 function postToFile(postdata) {
