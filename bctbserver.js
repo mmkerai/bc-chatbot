@@ -351,7 +351,14 @@ function getApiData(method,params,fcallback,cbparam) {
 		{
 			Exceptions.APIJsonError++;
 			emsg = TimeNow+ ": API did not return JSON message: "+str;
-			console.log(emsg);
+			sendToLogs(emsg);
+			return;
+		}
+    var resp = jsonObj.Status;
+    if(resp !== 'success')
+    {
+			Exceptions.APIJsonError++;
+			emsg = TimeNow+ ":"+method+": Error: "+str;
 			sendToLogs(emsg);
 			return;
 		}
@@ -361,7 +368,6 @@ function getApiData(method,params,fcallback,cbparam) {
 		{
 			Exceptions.noJsonDataMsg++;
 			emsg = TimeNow+ ":"+method+": No data: "+str;
-			console.log(emsg);
 			sendToLogs(emsg);
 			return;
 		}
@@ -414,12 +420,12 @@ function processChatMessage(cMsg) {
 	var cmobj = new ChatMessage(cMsg.ChatID);
 	if(cMsg.EndedReasonType == "")	// this is a message not chat ended event
 	{
+    cmobj.name = cMsg.CMName;
+    cmobj.text = cleanText(decode(cMsg.CMText));
+    cmobj.date = cMsg.CMCreated;
+    console.log("Text: "+decode(cMsg.CMText));
 		if(cMsg.CMPersonType == 1)		// if visitor sent this
     {
-			cmobj.name = cMsg.CMName;
-      cmobj.text = cleanText(decode(cMsg.CMText));
-      cmobj.date = cMsg.CMCreated;
-      console.log("Text: "+decode(cMsg.CMText));
       sendBotMessage(cmobj);
     }
 //	debugLog("CMObject",cmobj);
@@ -449,7 +455,17 @@ function updateChatMsgTimer() {
 }
 
 function sendBotMessage(cobj) {
-  var botm = "This is a message from a bot";
+  var botm;
+
+  if(cobj.text.indexOf("hello") !== -1 || obj.text.indexOf("hi") !== -1)
+      botm = "Hi "+cobj.name+" how are you?";
+  else if(cobj.text.indexOf("help") !== -1 || obj.text.indexOf("please") !== -1)
+      botm = cobj.name+", how can I help you?";
+  else if(cobj.text.indexOf("bye") !== -1 || obj.text.indexOf("ciao") !== -1)
+      botm = "Goodbye "+cobj.name+", talk to you soon";
+  else
+      botm = "Sorry "+cobj.name+", I dont understand, I am a bot";
+
   var str = "ChatID="+cobj.chatID+"&Type=operator&Message="+encodeURIComponent(botm)+"&OperatorID="+mkOperatorID;
   getApiData("addChatMessage",str,sendMessageCallback);
 
