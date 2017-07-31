@@ -16,13 +16,20 @@
 		<div class='btn btn-primary' onClick='getDepartments()'>Get Departments</div>
 	</div>
 	<div class="col-xs-2">
-		<div class='btn btn-primary' onClick='getOperators()'>Get Operators</div>
+		<div class='btn btn-primary' onClick='showOperators()'>Show Operators</div>
 	</div>
-	<div class="col-xs-3">
-		<div class='btn btn-warning' onClick='startBot()'>Start bot</div>
+	<form id="opform">
+<!--	<div class="form-group">-->
+		<label class="control-label col-xs-2">Set Operator:</label>
+		<div class="col-xs-2">
+			<select class="form-control" id="OpSelect" onchange="getSelected(this);"></select>
+		</div>
+	</form>
+	<div class="col-xs-2">
+		<div class='btn btn-warning' onClick='startMonitor()'>Monitor</div>
 	</div>
-	<div class="col-xs-3">
-		<div class='btn btn-warning' onClick='stopBot()'>Stop bot</div>
+	<div class="col-xs-2">
+		<div class='btn btn-warning' onClick='stopMonitor()'>Stop monitoring</div>
 	</div>
 </div>
 <p>&nbsp;</p>
