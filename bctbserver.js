@@ -301,13 +301,13 @@ function operatorsCallback(dlist) {
 	OperatorsSetupComplete = true;
 }
 
-function addChatMessageCallback(jobj) {
-	var str = "Chat Message: "+jobj;
+function addChatMessageCallback(info) {
+	var str = "Chat Message: "+info;
 	sendToLogs(str);
 }
 
-function assignChatCallback(jobj) {
-	var str = "Assign Chat: "+jobj;
+function assignChatCallback(info) {
+	var str = "Assign Chat: "+info;
 	sendToLogs(str);
 }
 
@@ -351,7 +351,7 @@ function getApiData(method,params,fcallback,cbparam) {
 		data = jsonObj.Data;
 		if(data === 'undefined' || data == null)
 		{
-      fcallback(jsonObj,cbparam);
+      fcallback(jsonObj.Status);
 		}
     else
 		  fcallback(data,cbparam);
@@ -422,7 +422,8 @@ function processChatMessage(cMsg) {
 function processChatStarted(obj) {
   var str = "ChatID="+obj.ChatID+"&OperatorID="+AssignedOperatorID+"&Forced=true";
   getApiData("assignChat",str,assignChatCallback);
-	io.sockets.in(MONITORROOM).emit('consoleLogs',"New chat started and assigned to "+Operators[AssignedOperatorID].operatorName);
+  io.sockets.in(MONITORROOM).emit('consoleLogs',"New chat started and assigned to "+Operators[AssignedOperatorID].operatorName);
+  io.sockets.in(MONITORROOM).emit('consoleLogs',"Initial Question "+obj.InitialQuestion);
 }
 
 function removeSocket(id,evname) {
@@ -446,12 +447,14 @@ function sendBotMessage(cobj) {
 
   if(cobj.text.indexOf("hello") !== -1 || cobj.text.indexOf("hi") !== -1)
       botm = "Hi "+cobj.name+" how are you?";
+  else if(cobj.text.indexOf("question") !== -1 || cobj.text.indexOf("have") !== -1)
+          botm = cobj.name+", what is your question?";
   else if(cobj.text.indexOf("help") !== -1 || cobj.text.indexOf("please") !== -1)
       botm = cobj.name+", how can I help you?";
   else if(cobj.text.indexOf("bye") !== -1 || cobj.text.indexOf("ciao") !== -1)
       botm = "Goodbye "+cobj.name+", talk to you soon";
   else
-      botm = "Sorry "+cobj.name+", I dont understand, I am only a bot";
+      botm = "Sorry "+cobj.name+", I dont understand, I am only a simple bot";
 
   var str = "ChatID="+cobj.chatID+"&Type=operator&Message="+encodeURIComponent(botm)+"&OperatorID="+AssignedOperatorID;
   getApiData("addChatMessage",str,addChatMessageCallback);
