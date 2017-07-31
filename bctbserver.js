@@ -371,7 +371,7 @@ function getApiData(method,params,fcallback,cbparam) {
 			sendToLogs(emsg);
 			return;
 		}*/
-		fcallback(data,cbparam);
+		fcallback(jsonObj,cbparam);
 
 		var next = jsonObj.Next;
 		if(typeof next !== 'undefined')
