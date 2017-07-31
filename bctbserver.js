@@ -417,7 +417,6 @@ function processChatStarted(obj) {
   var str = "ChatID="+obj.ChatID+"&OperatorID="+mkOperatorID+"&Forced=true";
   getApiData("assignChat",str,assignChatCallback);
 	io.sockets.in(MESSAGEROOM).emit('consoleLogs',"New chat started and assigned to "+Operators[mkOperatorID].operatorName);
-  }
 }
 
 function removeSocket(id,evname) {
