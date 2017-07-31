@@ -450,7 +450,7 @@ function updateChatMsgTimer() {
 
 function sendBotMessage(cobj) {
   var botm = "This is a message from a bot";
-  var str = "ChatID="+cobj.chatID+"&Type=0&Message="+encodeURIComponent(botm)+"&OperatorID="+mkOperatorID;
+  var str = "ChatID="+cobj.chatID+"&Type=operator&Message="+encodeURIComponent(botm)+"&OperatorID="+mkOperatorID;
   getApiData("addChatMessage",str,sendMessageCallback);
 
 }
