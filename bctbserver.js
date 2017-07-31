@@ -321,7 +321,7 @@ function operatorsCallback(dlist) {
 	OperatorsSetupComplete = true;
 }
 
-function sendMessageCallback(jobj) {
+function addChatMessageCallback(jobj) {
 	var str = "Response Message: "+jobj;
 	sendToLogs(str);
 }
@@ -362,16 +362,14 @@ function getApiData(method,params,fcallback,cbparam) {
 			sendToLogs(emsg);
 			return;
 		}
-/*		var data = new Array();
+		var data = new Array();
 		data = jsonObj.Data;
 		if(data === 'undefined' || data == null)
 		{
-			Exceptions.noJsonDataMsg++;
-			emsg = TimeNow+ ":"+method+": No data: "+str;
-			sendToLogs(emsg);
-			return;
-		}*/
-		fcallback(jsonObj,cbparam);
+      fcallback(jsonObj,cbparam);
+		}
+    else
+		  fcallback(data,cbparam);
 
 		var next = jsonObj.Next;
 		if(typeof next !== 'undefined')
@@ -467,7 +465,7 @@ function sendBotMessage(cobj) {
       botm = "Sorry "+cobj.name+", I dont understand, I am a bot";
 
   var str = "ChatID="+cobj.chatID+"&Type=operator&Message="+encodeURIComponent(botm)+"&OperatorID="+mkOperatorID;
-  getApiData("addChatMessage",str,sendMessageCallback);
+  getApiData("addChatMessage",str,addChatMessageCallback);
 }
 
 function postToFile(postdata) {
