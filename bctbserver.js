@@ -96,6 +96,12 @@ io.on('connection', function(socket){
 		socket.emit('departmentResponse',Departments);
 	});
 
+  socket.on('assignOperatorRequest', function(opid){
+    AssignedOperatorID = opid;
+    var text = "Assigned to Operator: "+Operators[AssignedOperatorID].operatorName;
+    io.sockets.in(MONITORROOM).emit('consoleLogs',text);
+	});
+
 	// join room which does the report every 3 mins and multicasts it to all subscribers
 	socket.on('join room',function(room){
 		console.log("Joining room "+room);
@@ -152,7 +158,7 @@ var TimeNow;			// global for current time
 var StartOfDay;			// global time for start of the day
 var EndOfDay;			// global time for end of the day before all stats are reset
 var Exceptions;
-var mkOperatorID;
+var AssignedOperatorID;
 
 console.log("Server started on port "+PORT);
 doStartOfDay();		// initialise everything
@@ -285,10 +291,10 @@ function operatorsCallback(dlist) {
 	for(var i in dlist)
 	{
 		Operators[dlist[i].LoginID] = new OpMetrics(dlist[i].LoginID,dlist[i].Name);
-    if(dlist[i].Name.indexOf("Courtney") !== -1)
+    if(dlist[i].Name.indexOf("Manji") !== -1)
     {
-      mkOperatorID = dlist[i].LoginID;
-      sendToLogs("Manji Operator ID: "+mkOperatorID);
+      AssignedOperatorID = dlist[i].LoginID;
+      sendToLogs("Manji Operator ID: "+AssignedOperatorID);
     }
 	}
 	sendToLogs("No of Operators: "+Object.keys(Operators).length);
@@ -414,9 +420,9 @@ function processChatMessage(cMsg) {
 }
 
 function processChatStarted(obj) {
-  var str = "ChatID="+obj.ChatID+"&OperatorID="+mkOperatorID+"&Forced=true";
+  var str = "ChatID="+obj.ChatID+"&OperatorID="+AssignedOperatorID+"&Forced=true";
   getApiData("assignChat",str,assignChatCallback);
-	io.sockets.in(MONITORROOM).emit('consoleLogs',"New chat started and assigned to "+Operators[mkOperatorID].operatorName);
+	io.sockets.in(MONITORROOM).emit('consoleLogs',"New chat started and assigned to "+Operators[AssignedOperatorID].operatorName);
 }
 
 function removeSocket(id,evname) {
@@ -447,7 +453,7 @@ function sendBotMessage(cobj) {
   else
       botm = "Sorry "+cobj.name+", I dont understand, I am only a bot";
 
-  var str = "ChatID="+cobj.chatID+"&Type=operator&Message="+encodeURIComponent(botm)+"&OperatorID="+mkOperatorID;
+  var str = "ChatID="+cobj.chatID+"&Type=operator&Message="+encodeURIComponent(botm)+"&OperatorID="+AssignedOperatorID;
   getApiData("addChatMessage",str,addChatMessageCallback);
 }
 
