@@ -74,7 +74,7 @@ $(document).ready(function() {
 });
 
 function getSelected(opsel) {
-	var opid = opsel.val();
+	var opid = opsel.value();
 	console.log("Operator selected: "+opid);
 }
 /*

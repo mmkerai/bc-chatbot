@@ -51,12 +51,16 @@ app.get('/index.js', function(req, res){
 	res.sendFile(__dirname + '/index.js');
 });
 
-// Process incoming Boldchat triggered chat message
+// GET request used to test connectivity
 app.get('/test', function(req, res){
-	res.send({ "result": "success" });
-	sendToLogs("New Chat Message, chat id: "+req.body.ChatID);
-	if(OperatorsSetupComplete)		//make sure all static data has been obtained first
-		processChatMessage(req.body);
+	var str = "";
+	res.send({"result": "success"});
+	for(var key in req.query)
+	{
+		if(req.query.hasOwnProperty(key))
+			str += key +":"+req.query[key]+",";
+	}
+	sendToLogs("Test Success: "+str);
 });
 
 // Process incoming Boldchat triggered chat message
@@ -66,6 +70,15 @@ app.post('/chatMessage', function(req, res){
 	sendToLogs("New Chat Message, chat id: "+req.body.ChatID);
 	if(OperatorsSetupComplete)		//make sure all static data has been obtained first
 		processChatMessage(req.body);
+});
+
+// Process incoming Boldchat triggered chat message
+app.post('/chatStarted', function(req, res){
+	Exceptions.chatStarted++;
+	res.send({ "result": "success" });
+	sendToLogs("Chat Started, chat id: "+req.body.ChatID);
+	if(OperatorsSetupComplete)		//make sure all static data has been obtained first
+		processChatStarted(req.body);
 });
 
 process.on('uncaughtException', function (err) {
@@ -108,6 +121,8 @@ io.on('connection', function(socket){
 var Exception = function() {
 		this.APIJsonError = 0;
 		this.noJsonDataMsg = 0;
+    this.chatMessages = 0;		// daily chat messages
+    this.chatStarted = 0;
 };
 
 //******* Global class for operator info
@@ -174,47 +189,6 @@ function cleanText(mytext) {
 	return(clean3);
 }
 
-function validateSignature(body, triggerUrl) {
-
-	var unencrypted = getUnencryptedSignature(body, triggerUrl);
-	var encrypted = encryptSignature(unencrypted);
-//	console.log('unencrypted signature', unencrypted);
-//	console.log('computed signature: '+ encrypted);
-//	console.log('trigger signature: '+ body.signature);
-	if(encrypted == body.signature)
-		return true;
-
-	var str = "Trigger signature validation error: "+triggerUrl;
-	Exceptions.signatureInvalid++;
-	sendToLogs(str);
-//	debugLog(triggerUrl,body);
-	return true;	// true while testing - change to false afterwards
-}
-
-function getUnencryptedSignature(body, triggerUrl) {
-	if (!body.signed) {
-		throw new Error('No signed parameter found for computing signature hash');
-	}
-	var signatureParamNames = body.signed.split('&');
-
-	var paramNameValues = new Array();
-	for (var i = 0; i < signatureParamNames.length; i++) {
-		var signParam = signatureParamNames[i];
-		paramNameValues.push(encodeURIComponent(signParam) + '=' + encodeURIComponent(body[signParam]));
-	}
-
-	var separator = triggerUrl.indexOf('?') === -1 ? '?' : '&';
-	var unc = triggerUrl + separator + paramNameValues.join('&');
-	var adj = unc.replace(/%20/g,'+');		// %20 to a + (old style)
-	return adj.replace(/\'/g,'%27');	// ' should be encoded (old style)
-}
-
-function encryptSignature(unencryptedSignature) {
-	var source = unencryptedSignature + KEY;
-	var hash = crypto.createHash('sha512').update(source).digest('hex');
-	return hash.toUpperCase();
-}
-
 function initialiseGlobals () {
 	Departments = new Object();
 	Operators = new Object();
@@ -274,7 +248,7 @@ function debugLog(name, dataobj) {
 
 function sendToLogs(text) {
 	console.log(text);
-	io.emit('consoleLogs',text);
+	io.sockets.in(MESSAGEROOM).emit('consoleLogs',text);
 }
 
 function deptsCallback(dlist) {
@@ -322,7 +296,12 @@ function operatorsCallback(dlist) {
 }
 
 function addChatMessageCallback(jobj) {
-	var str = "Response Message: "+jobj;
+	var str = "Chat Message: "+jobj;
+	sendToLogs(str);
+}
+
+function assignChatCallback(jobj) {
+	var str = "Assign Chat: "+jobj;
 	sendToLogs(str);
 }
 
@@ -434,12 +413,18 @@ function processChatMessage(cMsg) {
   }
 }
 
+function processChatStarted(obj) {
+  var str = "ChatID="+obj.ChatID+"&OperatorID="+mkOperatorID+"&Forced=true";
+  getApiData("assignChat",str,assignChatCallback);
+	io.sockets.in(MESSAGEROOM).emit('consoleLogs',"New chat started and assigned to "+Operators[mkOperatorID].operatorName);
+  }
+}
+
 function removeSocket(id,evname) {
 	sendToLogs("Socket "+evname+" at "+ TimeNow);
 }
 
 function updateChatMsgTimer() {
-
 	if(!OperatorsSetupComplete) return;		//try again later
 
 	TimeNow = new Date();		// update the time for all calculations
@@ -449,7 +434,6 @@ function updateChatMsgTimer() {
 		setTimeout(doStartOfDay,10000);	//restart after 10 seconds to give time for ajaxes to complete
 		return;
 	}
-//	postToFile(getCsvChatMsgs);
 }
 
 function sendBotMessage(cobj) {
@@ -462,7 +446,7 @@ function sendBotMessage(cobj) {
   else if(cobj.text.indexOf("bye") !== -1 || cobj.text.indexOf("ciao") !== -1)
       botm = "Goodbye "+cobj.name+", talk to you soon";
   else
-      botm = "Sorry "+cobj.name+", I dont understand, I am a bot";
+      botm = "Sorry "+cobj.name+", I dont understand, I am only a bot";
 
   var str = "ChatID="+cobj.chatID+"&Type=operator&Message="+encodeURIComponent(botm)+"&OperatorID="+mkOperatorID;
   getApiData("addChatMessage",str,addChatMessageCallback);
