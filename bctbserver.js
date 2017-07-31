@@ -141,7 +141,7 @@ var ChatMessage = function(chatid) {
 };
 
 //******************** Global constants for chat messages
-const MESSAGEROOM = "chat_message_room";	// socket room name for chat messages
+const MONITORROOM = "monitor_room";	// socket room name for monitoring
 
 //******************** Global variables for chat data
 var	Departments;	// array of dept ids and dept name objects
@@ -248,7 +248,7 @@ function debugLog(name, dataobj) {
 
 function sendToLogs(text) {
 	console.log(text);
-	io.sockets.in(MESSAGEROOM).emit('consoleLogs',text);
+	io.sockets.in(MONITORROOM).emit('consoleLogs',text);
 }
 
 function deptsCallback(dlist) {
@@ -407,7 +407,7 @@ function processChatMessage(cMsg) {
     }
 //	debugLog("CMObject",cmobj);
 	AllChatMessages.push(cmobj);
-	io.sockets.in(MESSAGEROOM).emit('chatMessage',cmobj);
+	io.sockets.in(MONITORROOM).emit('chatMessage',cmobj);
 //	var csv = objectToCsv(cmobj);
 //	postToFile(csv);
   }
@@ -416,7 +416,7 @@ function processChatMessage(cMsg) {
 function processChatStarted(obj) {
   var str = "ChatID="+obj.ChatID+"&OperatorID="+mkOperatorID+"&Forced=true";
   getApiData("assignChat",str,assignChatCallback);
-	io.sockets.in(MESSAGEROOM).emit('consoleLogs',"New chat started and assigned to "+Operators[mkOperatorID].operatorName);
+	io.sockets.in(MONITORROOM).emit('consoleLogs',"New chat started and assigned to "+Operators[mkOperatorID].operatorName);
 }
 
 function removeSocket(id,evname) {
